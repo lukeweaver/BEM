@@ -1,0 +1,901 @@
+\documentclass [12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{exceltex}
+\usepackage{filecontents}
+\usepackage{caption}
+\begin {document}
+%{tikz-pgf}{floats}{horizontal-alignment}%
+\title {Use of Actuator Disc Techniques for Power Estimation}
+\author{Luke Weaver}
+\maketitle
+
+\section {Abstract}
+\section {Introduction}
+Wind energy is an increasingly large industry in the United States, reaching 3.56\%
+of the total generated energy in the US. Although this number may seem small, wind energy generation nearly doubled from 2009 to 2012, and could reach 20\%  
+of the totally energy consumption by 2030. \\
+
+As wind energy grows, it is important to be able to accurately predict the potential power generation of wind farms. Power estimation requires accurate modeling of the terrain, wind behavior, wind turbine forces, and wake effects. Although there has been rather extensive research on the subject of wind power forecasting, there are very few comprehensive systems of power prediction that allow for complex terrain and wind behavior. \\
+
+The focus of this paper is on the prediction of wind turbine power generation using actuator disc theory and CFD techniques.
+The actuator disc (AD) theory is a simplification of turbine-induced forces. Rather than modeling the actual blades—which can be very computationally expensive—it is common practice to replace the blades with forces that act on the wind in a way that allows for relatively fast convergence of CFD equations, as well as accurate prediction of wind power and wake effects.
+In the case of the actuator disc, the wind turbine is modeled by uniform force over a thin disc of the same diameter as the wind turbine being modeled. The theory for AD power prediction, as well as the application in CFD solvers is found in the sections below.
+
+\section{Theory}
+The actuator disc is represented by a uniform force, in the form of a pressure drop, over a thin disc. Because conservation of mass does not allow instantaneous change in velocity, the stream tube of wind that flows through the actuator disc must start small upstream, expand until the disc, and continue to expand downstream once the velocity  of the wind has been reduced. A visual representation of the actuator disc is shown in Figure~\ref{fig:ActuatorDisc}.
+
+\begin{figure}[!hbtp]
+\includegraphics{ActuatorDisc}
+\caption{Actuator Disc}\label{fig:ActuatorDisc}
+\end{figure}
+The conservation of mass of the stream tube is 
+\begin{equation}\label{eq:1}
+\dot{m} =(\rho AU)_\infty=(\rho AU)_d=(\rho AU)_w
+\end{equation}
+
+Bernoulli’s equation states that for inviscid flow, the sum of the static pressure, dynamic pressure, and potential energy is a constant. Applying Bernoulli’s equation (and assuming no change in potential energy) to the stream tube shown in Figure~\ref{fig:ActuatorDisc} yields:
+
+\begin{equation}\label{eq:2}
+\frac{1}2 \rho U_\infty^2+p_\infty=\frac{1}{2} \rho U_d^2+p_d^+
+\end{equation}
+\begin{equation}\label{eq:3}
+\frac{1}2 \rho U_w^2+p_w=\frac{1}2 \rho U_d^2+p_d^+
+\end{equation}
+
+We manipulate equations \ref{eq:2} and \ref{eq:3} to find the pressure drop across the actuator disc.
+
+\begin{equation}\label{eq:4}
+(p_d^+-p_d^- )=\frac{1}{2} \rho (U_\infty^2-U_w^2)
+\end{equation}
+
+We designate the axial induction factor ‘a’ as:
+\begin{equation}\label{eq:4}
+a=\frac{U_\infty-U_d } {U_\infty}
+\end{equation}
+
+The force on the disc can be expressed as the pressure drop across the disc times the area:
+
+
+\begin{equation}\label{eq:5}
+F=(p_d^+-p_d^- ) A_d=2\rho A_d U_\infty^2 a(1-a)
+\end{equation}
+
+The thrust coefficient is the ratio of the force on the disc to the total force of the wind
+
+
+\begin{equation}\label{eq:6}
+C_T=\frac{F_{disc}}{F_{wind}}=\frac{2\rho A_d U_\infty^2 a(1-a)}{\frac{1}{2} \rho A_d U_\infty^2 }}
+\end{equation}
+
+\begin{equation}\label{eq:7}
+C_T=4a(1-a)
+\end{equation}
+
+Finally, the power of the actuator disc is the force on the disc times the velocity at the disc.
+
+\begin{equation}\label{eq:8}
+P=F_d U_d=2\rho A_d U_\infty^3 a(1-a)^2
+\end{equation}
+ and the coefficient of power is the ratio of the power of the disc divided by the overall power in the wind.
+
+\begin{equation}\label{eq:9}
+C_P=\frac{P}{\frac{1}{2} \rho U_\infty^3 A_d }=4a(1-a)^2
+\end{equation}
+
+\section{Application}
+Simulations were carried out using the CFD solver ANSYS CFX. The dimensions of the fluid domain was 80m x 120m x 480m (Figure~\ref{fig:Mesh})(Figure~\ref{fig:DiscMesh})(Figure~\ref{fig:Setup}), \\while the turbine was represented by a 40m diameter disc  with a thickness of .001m and a hub height of 80 m. The entire domain consisted of 1 million elements. The domain consisted of three no slip walls and an opening to atmospheric pressure at the top. An inflation was included at the walls, which had no slip conditions. Ten trials were ran using wind velocities of 5 to 14 m/s. All solutions converged to 1E-5 RMS. 
+
+The source term is defined in the ANSYS theory guide as
+\begin{equation}\label{eq:10}
+S=\frac{\Delta p}{\Delta x}=K \frac{\rho} {2}\vec{U} |U|
+\end{equation}
+
+Where K is the Resistance Loss coefficient.
+
+From equations 4, 6, and 7, we can express the thrust coefficient as
+%\begin{equation}\label{eq:11}
+%C_T=\frac{F_disc}{(\frac{1}{2} \rho U_\infty^2 A_d }=\frac{p_d^+-p_d^- }{\frac{1}{2} \rho U_\infty^2 )
+%\end{equation}
+
+Rearranging, the pressure drop across the disc is
+
+\begin{equation}\label{eq:12}
+\Delta p=\frac{1}{2} C_T \rho U_\infty^2
+\end{equation}
+
+Replacing the pressure drop into equation 11 yields
+
+\begin{equation}\label{eq:13}
+S=\frac{C_T \rho U_\infty^2}{2\Delta x}= K\frac{\rho}{2} U_d^2
+\end{equation}
+
+Solve for K.
+
+\begin{equation}\label{eq:14}
+K=\frac{C_T U_\infty^2}{\Delta x U_d^2 }
+\end{equation}
+Solving equation 5 for the disc velocity and inserting that value into equation 15 yields
+\begin{equation}\label{eq:15}
+K=\frac{C_T}{\Delta x(1-a)^2 }
+\end{equation}
+
+Where the units of K are $m^-1$. This is consistent with the units required for CFX-Pre.
+
+The process for determining the value of the source term is as follows:
+Determine target upstream velocity
+Determine corresponding Ct value from turbine manufacturer
+Calculate axial induction factor using equation %%
+Calculate source term K using Ct and disc thickness as $\Delta x$
+Enter K in Directional Loss Model
+Solve using CFX
+
+\begin{center}
+\includegraphics{Mesh}
+\captionof{figure}{Mesh}
+\label{fig:Mesh}
+\end{center}
+
+\begin{center}
+\includegraphics{DiscMesh}
+\captionof{figure}{Disc Mesh}
+\label{fig:DiscMesh}
+\end{center}
+
+\begin{center}
+\includegraphics{Setup}
+\captionof{figure}{Setup}
+\label{fig:Setup}
+\end{center}
+
+\section{Results}
+With no drag forces from the turbine nacelle or tower, the turbine wakes were comparable to experimental data from Batten et al. Figures 5 and 6 show the wake and non-dimensional centerline velocity at an inlet velocity of 7 m/s and a thrust coefficient of .79. On average, the centerline velocity recovered to 90\% of the inlet velocity 3D downstream.
+
+\begin{center}
+\includegraphics{Wake}
+\captionof{figure}{Wake at 7 m/s inlet velocity and thrust coefficient of .79}
+\label{fig:Wake}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+	\begin{axis}[
+		xlabel=x/D (m),
+		ylabel=U/U0 (m/s),
+		ymin=0,
+		ymax=1.1,
+		xmin=-2,
+		xmax=7,
+		grid=major]
+\addplot[color=red,mark=x] coordinates {
+(		-1	1.00)
+(-0.85714283	,1.00)
+(-0.71428566	,1.00)
+(-0.57142849	,0.99)
+(-0.42857132	,0.98)
+(-0.285714174	,0.95)
+(-0.142857028	,0.89)
+(1.19209E-07	,0.78)
+(0.142857265	,0.66)
+(0.285714411	,0.60)
+(0.428571558	,0.56)
+(0.57142868	,0.58)
+(0.71428585	,0.64)
+(0.857143021	,0.70)
+(1.000000191	,0.76)
+(1.142857361	,0.80)
+(1.285714525	,0.84)
+(1.4285717	,0.86)
+(1.571428875	,0.87)
+(1.714286038	,0.89)
+(1.857143213	,0.90)
+(2.000000388	,0.90)
+(2.14285755	,0.91)
+(2.428571888	,0.92)
+(2.571429063	,0.92)
+(2.714286238	,0.93)
+(2.8571434	,0.93)
+(3.000000575	,0.93)
+(3.142857738	,0.93)
+(3.285714725	,0.93)
+(3.4285717	,0.93)
+(3.571428675	,0.94)
+(3.714285663	,0.94)
+(3.857142638	,0.94)
+(3.999999613	,0.94)
+(4.1428566	,0.94)
+(4.285713575	,0.94)
+(4.428570563	,0.94)
+(4.571427538	,0.94)
+(4.714284513	,0.94)
+(4.8571415	,0.94)
+(4.999998475	,0.94)
+(5.14285545	,0.95)
+(5.285712438	,0.95)
+(5.428569413	,0.95)
+(5.714283375	,0.95)
+(5.85714035	,0.95)
+(5.999997325	,0.95)
+
+	};
+	\end{axis}
+\end{tikzpicture}
+\captionof{figure}{Centerline velocity at $U_0$ of 7 $\frac{m}{s}$ and $C_T$ of .79}
+\end{center}
+
+The complete tabulated values of CT , CP, and power for the ENERCON E-40 wind turbine are shown in Figure 7.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+	width=.8\textwidth,
+	xlabel=$\frac{x}{D} (m)$,
+	ylabel=$\frac{U}{U_0} (\frac{m}{s})$,
+	ymin=0,
+	ymax=1.1,
+	xmin=0,
+	xmax=15,
+	grid=major,
+	axis y line*=left,
+	axis x line*=bottom]
+
+\addplot coordinates {
+(5	,0.82)
+(6	,0.84)
+(7	,0.79)
+(8	,0.72)
+(9	,0.66)
+(10	,0.59)
+(11	,0.53)
+(12	,0.46)
+(13	,0.4)
+(14	,0.33)
+
+};
+\addplot coordinates {
+(5	,0.4141)
+(6	,0.411)
+(7	,0.41)
+(8	,0.412) 
+(9	,0.416)
+(10	,0.417)
+(11	,0.385)
+(12	,0.345)
+(13	,0.288)
+(14	,0.233)
+
+
+};
+\end{axis}
+
+\begin{axis}[  
+width=.8\textwidth,                                                               
+xmin=0, xmax=15,                                                             
+ymin=0, ymax=600, 
+ylabel near ticks,                                                              
+ylabel={Power (kW)},                                                                     
+axis y line*=right,
+axis x line*=bottom]
+
+\addplot coordinates{
+(5	,40.390)
+(6	,69.360)
+(7	,112.190)
+(8	,165.380)
+(9	,236.890)
+(10	,328.000)
+(11	,396.640)
+(12	,465.150)
+(13	,495.950)
+(14	,500.000)
+
+
+};
+\end{axis}
+\end{tikzpicture}
+\captionof{figure}{$C_P$, $C_T$, and Power Values}
+\end{center}
+
+%Figure 8%
+shows the non-dimensional centerline velocity at each wind speed and corresponding thrust coefficient.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+	width=\textwidth,
+	xlabel=$\frac{x}{D} (m)$,
+	ylabel=$\frac{U}{U_0} (\frac{m}{s})$,
+	ymin=0,
+	ymax=1.1,
+	xmin=-2,
+	xmax=7,
+	grid=major]
+
+\addplot coordinates {
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,0.99)
+(-0.43	,0.98)
+(-0.29	,0.95)
+(-0.14	,0.89)
+(0.00	,0.76)
+(0.14	,0.64)
+(0.29	,0.57)
+(0.43	,0.53)
+(0.57	,0.55)
+(0.71	,0.61)
+(0.86	,0.68)
+(1.00	,0.75)
+(1.14	,0.79)
+(1.43	,0.85)
+(1.57	,0.87)
+(1.71	,0.88)
+(1.86	,0.89)
+(2.00	,0.90)
+(2.14	,0.91)
+(2.29	,0.91)
+(2.43	,0.92)
+(2.57	,0.92)
+(2.71	,0.92)
+(2.86	,0.92)
+(3.00	,0.93)
+(3.14	,0.93)
+(3.29	,0.93)
+(3.43	,0.93)
+(3.57	,0.93)
+(3.71	,0.93)
+(3.86	,0.93)
+(4.00	,0.93)
+(4.14	,0.93)
+(4.29	,0.93)
+(4.43	,0.93)
+(4.57	,0.93)
+(4.71	,0.93)
+(4.86	,0.93)
+(5.00	,0.93)
+(5.14	,0.93)
+(5.29	,0.93)
+(5.43	,0.93)
+(5.57	,0.93)
+(5.71	,0.93)
+(5.86	,0.93)
+(6.00	,0.93)
+
+};
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,0.99)
+(-0.43	,0.98)
+(-0.29	,0.95)
+(-0.14	,0.88)
+(0.00	,0.75)
+(0.14	,0.63)
+(0.29	,0.55)
+(0.43	,0.51)
+(0.57	,0.53)
+(0.71	,0.59)
+(0.86	,0.66)
+(1.00	,0.74)
+(1.14	,0.78)
+(1.29	,0.82)
+(1.43	,0.84)
+(1.57	,0.86)
+(1.71	,0.88)
+(1.86	,0.89)
+(2.00	,0.90)
+(2.14	,0.90)
+(2.29	,0.91)
+(2.43	,0.91)
+(2.57	,0.92)
+(2.71	,0.92)
+(2.86	,0.92)
+(3.00	,0.92)
+(3.14	,0.92)
+(3.29	,0.93)
+(3.43	,0.93)
+(3.57	,0.93)
+(3.71	,0.93)
+(3.86	,0.93)
+(4.00	,0.93)
+(4.14	,0.93)
+(4.29	,0.93)
+(4.43	,0.93)
+(4.57	,0.93)
+(4.71	,0.93)
+(4.86	,0.93)
+(5.00	,0.93)
+(5.14	,0.93)
+(5.29	,0.93)
+(5.43	,0.93)
+(5.57	,0.93)
+(5.71	,0.93)
+(5.86	,0.93)
+(6.00	,0.93)
+
+};
+
+\addplot coordinates{
+(		-1	1.00)
+(-0.85714283	,1.00)
+(-0.71428566	,1.00)
+(-0.57142849	,0.99)
+(-0.42857132	,0.98)
+(-0.285714174	,0.95)
+(-0.142857028	,0.89)
+(1.19209E-07	,0.78)
+(0.142857265	,0.66)
+(0.285714411	,0.60)
+(0.428571558	,0.56)
+(0.57142868	,0.58)
+(0.71428585	,0.64)
+(0.857143021	,0.70)
+(1.000000191	,0.76)
+(1.142857361	,0.80)
+(1.285714525	,0.84)
+(1.4285717	,0.86)
+(1.571428875	,0.87)
+(1.714286038	,0.89)
+(1.857143213	,0.90)
+(2.000000388	,0.90)
+(2.14285755	,0.91)
+(2.428571888	,0.92)
+(2.571429063	,0.92)
+(2.714286238	,0.93)
+(2.8571434	,0.93)
+(3.000000575	,0.93)
+(3.142857738	,0.93)
+(3.285714725	,0.93)
+(3.4285717	,0.93)
+(3.571428675	,0.94)
+(3.714285663	,0.94)
+(3.857142638	,0.94)
+(3.999999613	,0.94)
+(4.1428566	,0.94)
+(4.285713575	,0.94)
+(4.428570563	,0.94)
+(4.571427538	,0.94)
+(4.714284513	,0.94)
+(4.8571415	,0.94)
+(4.999998475	,0.94)
+(5.14285545	,0.95)
+(5.285712438	,0.95)
+(5.428569413	,0.95)
+(5.714283375	,0.95)
+(5.85714035	,0.95)
+(5.999997325	,0.95)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,0.99)
+(-0.43	,0.98)
+(-0.29	,0.96)
+(-0.14	,0.91)
+(0.00	,0.80)
+(0.14	,0.70)
+(0.29	,0.65)
+(0.43	,0.62)
+(0.57	,0.64)
+(0.71	,0.68)
+(0.86	,0.74)
+(1.00	,0.79)
+(1.14	,0.83)
+(1.29	,0.86)
+(1.43	,0.87)
+(1.57	,0.89)
+(1.71	,0.90)
+(1.86	,0.91)
+(2.00	,0.92)
+(2.14	,0.92)
+(2.29	,0.92)
+(2.43	,0.93)
+(2.57	,0.93)
+(2.71	,0.93)
+(2.86	,0.94)
+(3.00	,0.94)
+(3.14	,0.94)
+(3.29	,0.94)
+(3.43	,0.94)
+(3.57	,0.94)
+(3.71	,0.94)
+(3.86	,0.95)
+(4.00	,0.95)
+(4.14	,0.95)
+(4.29	,0.95)
+(4.43	,0.95)
+(4.57	,0.95)
+(4.71	,0.95)
+(4.86	,0.95)
+(5.00	,0.95)
+(5.14	,0.95)
+(5.29	,0.95)
+(5.43	,0.95)
+(5.57	,0.95)
+(5.71	,0.94)
+(5.86	,0.94)
+(6.00	,0.94)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,0.99)
+(-0.43	,0.98)
+(-0.29	,0.97)
+(-0.14	,0.92)
+(0.00	,0.83)
+(0.14	,0.74)
+(0.29	,0.69)
+(0.43	,0.67)
+(0.57	,0.68)
+(0.71	,0.72)
+(0.86	,0.77)
+(1.00	,0.82)
+(1.14	,0.84)
+(1.29	,0.87)
+(1.43	,0.89)
+(1.57	,0.90)
+(1.71	,0.91)
+(1.86	,0.92)
+(2.00	,0.92)
+(2.14	,0.93)
+(2.29	,0.93)
+(2.43	,0.94)
+(2.57	,0.94)
+(2.71	,0.94)
+(2.86	,0.94)
+(3.00	,0.94)
+(3.14	,0.94)
+(3.29	,0.95)
+(3.43	,0.95)
+(3.57	,0.95)
+(3.71	,0.95)
+(3.86	,0.96)
+(4.00	,0.96)
+(4.14	,0.96)
+(4.29	,0.96)
+(4.43	,0.96)
+(4.57	,0.96)
+(4.71	,0.96)
+(4.86	,0.96)
+(5.00	,0.96)
+(5.14	,0.96)
+(5.29	,0.96)
+(5.43	,0.96)
+(5.57	,0.96)
+(5.71	,0.96)
+(5.86	,0.96)
+(6.00	,0.96)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,0.99)
+(-0.43	,0.99)
+(-0.29	,0.97)
+(-0.14	,0.93)
+(0.00	,0.85)
+(0.14	,0.77)
+(0.29	,0.73)
+(0.43	,0.71)
+(0.71	,0.76)
+(0.86	,0.80)
+(1.00	,0.84)
+(1.14	,0.86)
+(1.29	,0.89)
+(1.43	,0.90)
+(1.57	,0.91)
+(2.00	,0.93)
+(2.14	,0.94)
+(2.29	,0.94)
+(2.43	,0.94)
+(2.57	,0.95)
+(2.71	,0.95)
+(2.86	,0.95)
+(3.00	,0.95)
+(3.14	,0.95)
+(3.29	,0.95)
+(3.43	,0.95)
+(3.57	,0.96)
+(3.71	,0.96)
+(3.86	,0.96)
+(4.00	,0.96)
+(4.14	,0.96)
+(4.29	,0.96)
+(4.43	,0.96)
+(4.57	,0.96)
+(4.71	,0.96)
+(4.86	,0.96)
+(5.00	,0.96)
+(5.14	,0.96)
+(5.29	,0.96)
+(5.43	,0.96)
+(5.57	,0.96)
+(5.71	,0.96)
+(5.86	,0.96)
+(6.00	,0.96)
+};
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,1.00)
+(-0.43	,0.99)
+(-0.29	,0.97)
+(-0.14	,0.94)
+(0.00	,0.87)
+(0.14	,0.80)
+(0.29	,0.76)
+(0.43	,0.75)
+(0.57	,0.76)
+(0.71	,0.79)
+(0.86	,0.82)
+(1.00	,0.86)
+(1.14	,0.88)
+(1.29	,0.90)
+(1.43	,0.91)
+(1.57	,0.92)
+(1.71	,0.93)
+(1.86	,0.94)
+(2.00	,0.94)
+(2.14	,0.95)
+(2.29	,0.95)
+(2.43	,0.95)
+(2.57	,0.95)
+(2.71	,0.95)
+(2.86	,0.95)
+(3.00	,0.96)
+(3.43	,0.96)
+(3.57	,0.96)
+(3.71	,0.96)
+(3.86	,0.97)
+(4.00	,0.97)
+(4.14	,0.97)
+(4.29	,0.97)
+(4.43	,0.97)
+(4.57	,0.97)
+(4.71	,0.97)
+(4.86	,0.97)
+(5.00	,0.97)
+(5.14	,0.97)
+(5.29	,0.97)
+(5.43	,0.96)
+(5.57	,0.96)
+(5.71	,0.96)
+(5.86	,0.96)
+(6.00	,0.96)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,1.00)
+(-0.43	,0.99)
+(-0.29	,0.98)
+(-0.14	,0.95)
+(0.00	,0.89)
+(0.14	,0.83)
+(0.29	,0.80)
+(0.43	,0.79)
+(0.57	,0.80)
+(0.71	,0.83)
+(0.86	,0.85)
+(1.00	,0.88)
+(1.14	,0.90)
+(1.29	,0.92)
+(1.43	,0.93)
+(1.57	,0.94)
+(1.71	,0.94)
+(1.86	,0.95)
+(2.00	,0.95)
+(2.14	,0.95)
+(2.29	,0.96)
+(2.43	,0.96)
+(2.57	,0.96)
+(2.71	,0.96)
+(2.86	,0.96)
+(3.00	,0.96)
+(3.14	,0.96)
+(3.29	,0.96)
+(3.43	,0.97)
+(3.57	,0.97)
+(3.71	,0.97)
+(3.86	,0.97)
+(4.00	,0.97)
+(4.14	,0.97)
+(4.29	,0.97)
+(4.43	,0.97)
+(4.57	,0.97)
+(4.71	,0.97)
+(4.86	,0.97)
+(5.00	,0.97)
+(5.14	,0.97)
+(5.29	,0.97)
+(5.43	,0.97)
+(5.57	,0.97)
+(5.71	,0.97)
+(5.86	,0.97)
+(6.00	,0.96)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,1.00)
+(-0.43	,0.99)
+(-0.29	,0.98)
+(-0.14	,0.96)
+(0.00	,0.90)
+(0.14	,0.86)
+(0.29	,0.83)
+(0.43	,0.82)
+(0.57	,0.83)
+(0.71	,0.85)
+(0.86	,0.87)
+(1.00	,0.90)
+(1.14	,0.91)
+(1.29	,0.93)
+(1.43	,0.94)
+(1.57	,0.94)
+(1.71	,0.95)
+(1.86	,0.95)
+(2.00	,0.96)
+(2.14	,0.96)
+(2.29	,0.96)
+(2.43	,0.96)
+(2.57	,0.97)
+(2.71	,0.97)
+(2.86	,0.97)
+(3.00	,0.97)
+(3.14	,0.97)
+(3.29	,0.97)
+(3.43	,0.97)
+(3.57	,0.97)
+(3.71	,0.97)
+(3.86	,0.97)
+(4.00	,0.97)
+(4.14	,0.97)
+(4.29	,0.97)
+(4.43	,0.97)
+(4.57	,0.97)
+(4.71	,0.97)
+(4.86	,0.97)
+(5.00	,0.97)
+(5.14	,0.97)
+(5.29	,0.97)
+(5.43	,0.97)
+(5.57	,0.97)
+(5.71	,0.97)
+(5.86	,0.97)
+(6.00	,0.96)
+};
+
+\addplot coordinates{
+(-1.00	,1.00)
+(-0.86	,1.00)
+(-0.71	,1.00)
+(-0.57	,1.00)
+(-0.43	,0.99)
+(-0.29	,0.99)
+(-0.14	,0.96)
+(0.00	,0.92)
+(0.14	,0.88)
+(0.29	,0.86)
+(0.43	,0.86)
+(0.57	,0.86)
+(0.71	,0.88)
+(0.86	,0.90)
+(1.00	,0.92)
+(1.14	,0.93)
+(1.29	,0.94)
+(1.43	,0.95)
+(1.57	,0.96)
+(1.71	,0.96)
+(1.86	,0.96)
+(2.00	,0.97)
+(2.14	,0.97)
+(2.29	,0.97)
+(2.43	,0.97)
+(2.57	,0.97)
+(2.71	,0.97)
+(2.86	,0.97)
+(3.00	,0.98)
+(3.14	,0.98)
+(3.29	,0.98)
+(3.43	,0.98)
+(3.57	,0.98)
+(3.71	,0.98)
+(3.86	,0.98)
+(4.00	,0.98)
+(4.14	,0.98)
+(4.29	,0.98)
+(4.43	,0.98)
+(4.57	,0.98)
+(4.71	,0.98)
+(4.86	,0.98)
+(5.00	,0.98)
+(5.14	,0.98)
+(5.29	,0.98)
+(5.43	,0.98)
+(5.57	,0.98)
+(5.71	,0.98)
+(5.86	,0.98)
+(6.00	,0.98)
+};
+
+
+\legend{$U=5$ $ C_T=.82$,
+		$U=6$ $ C_T=.84$,
+		$U=7$ $ C_T=.79$,
+		$U=8$ $ C_T=.72$,
+		$U=9$ $ C_T=.66$,
+		$U=10$ $ C_T=.59$,
+		$U=11$ $ C_T=.53$,
+		$U=12$ $ C_T=.46$,
+		$U=13$ $ C_T=.40$,
+		$U=14$ $ C_T=.33$}
+\end{axis}
+\end{tikzpicture}
+\captionof{figure}{Non-dimensional centerline velocity}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[                                                                 
+xmin=0, xmax=20,                                                             
+ymin=0, ymax=600000,                                                               
+ylabel={Power (kW)},
+grid=major]
+\addplot coordinates{
+(5	,40390)
+(6	,69360)
+(7	,112190)
+(8	,165380)
+(9	,236890)
+(10	,328000)
+(11	,396640)
+(12	,465150)
+(13	,495950)
+(14	,500000)
+
+};
+\addplot coordinates{
+(5	,53158.57013)
+(6	,93182.44202)
+(7	,142506.4922)
+(8	,199644.2448)
+(9	,266422.1197)
+(10	,334622.0211)
+(11	,407664.4039)
+(12	,468579.7586)
+(13	,526396.9086)
+(14	,551110.4806)
+};
+\legend{Simulated,
+	   Data}
+\end{axis}
+\end{tikzpicture}
+\captionof{figure}{Power comparison of the simulation}
+\end{center}
+
+\section{Conclusions/Further work}
+Actuator disc theory as well as the computer simulations overestimated the power in every case given the wind data and thrust coefficient from the manufacturer. More research should be done on whether over prediction of power by actuator disc theory is typical. Another possible explanation is that the thrust coefficient data is calculated from an average of all wind directions. Since yawed rotors were not studied in this case, and the simulations involved only uniform axial flow, it is expected that changing the direction of the wind would reduce power generation. \\
+
+Possible improvements to the power estimation simulations could be made by including complex geometry (terrain), and more realistic wind profiles. Considering that these test cases essentially simulated wind flow in a large wind tunnel with a uniform, axial flow, it could be reasonable to assume that a wind profile imitating real wind flow over terrain would improve the accuracy of these tests.\\
+Mesh refinement is certainly a factor that could improve the accuracy of the results.\\ %Need more info about a "good" mesh%\\
+The knowledge of the ENERCON E-40 wind turbine is relatively small. Although the thrust coefficent, power coefficient, and power are known at every relevant wind speed, the conditions under which these values are determined are unknown. Further improvements on simulations could be made by determining these conditions, and altering the simulations accordingly.\\
+In order to further validate these results, experimental data of the wake behind the turbines would be beneficial for comparisons to the simulations. Additionally, wake comparisons using other simulation methods--blade element momentum theory, yawed rotor, coned rotor, vortex method, or other methods--could validate the data further
+\end {document}
+
